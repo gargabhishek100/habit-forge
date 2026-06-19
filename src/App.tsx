@@ -270,51 +270,55 @@ export default function HabitForge() {
   // --- UI Sections ---
 
   const renderDashboard = () => (
-    <div className="space-y-6">
-      
-      {/* Star Score Card */}
-      <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-        <div className="absolute top-0 right-0 opacity-10 transform translate-x-4 -translate-y-4">
-          <Star size={120} fill="white" />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Left Column on large screens: Star Card + Daily Sync Card */}
+      <div className="lg:col-span-1 space-y-6">
+        {/* Star Score Card */}
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 opacity-10 transform translate-x-4 -translate-y-4">
+            <Star size={120} fill="white" />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center space-x-2 mb-2">
+              <Star size={24} fill="white" className="text-white" />
+              <span className="font-semibold text-yellow-50">Today's Score</span>
+            </div>
+            <div className="flex items-baseline space-x-2">
+              <span className="text-5xl font-bold">{todayStars}</span>
+              <span className="text-xl text-yellow-100">/ {maxStars} Stars</span>
+            </div>
+            <div className="mt-4 w-full bg-black/20 rounded-full h-2.5">
+              <div 
+                className="bg-white h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${(todayStars / maxStars) * 100}%` }}
+              ></div>
+            </div>
+          </div>
         </div>
-        <div className="relative z-10">
-          <div className="flex items-center space-x-2 mb-2">
-            <Star size={24} fill="white" className="text-white" />
-            <span className="font-semibold text-yellow-50">Today's Score</span>
+
+        {/* Daily Sync card */}
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-slate-700">Daily Sync</h3>
+            <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Today</span>
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-5xl font-bold">{todayStars}</span>
-            <span className="text-xl text-yellow-100">/ {maxStars} Stars</span>
-          </div>
-          <div className="mt-4 w-full bg-black/20 rounded-full h-2.5">
-            <div 
-              className="bg-white h-2.5 rounded-full transition-all duration-500"
-              style={{ width: `${(todayStars / maxStars) * 100}%` }}
-            ></div>
-          </div>
+          <p className="text-sm text-slate-500 mb-4">
+            Update your habits, then copy the row to paste into your Google Sheet.
+          </p>
+          <button 
+            onClick={copyToClipboard}
+            className={`w-full py-3 rounded-lg font-medium flex items-center justify-center space-x-2 transition-all ${
+              copied ? 'bg-green-100 text-green-700' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+            }`}
+          >
+            {copied ? <Check size={18} /> : <Copy size={18} />}
+            <span>{copied ? 'Copied Row!' : 'Copy Row for Google Sheets'}</span>
+          </button>
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-slate-700">Daily Sync</h3>
-          <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">20th Jan 2026</span>
-        </div>
-        <p className="text-sm text-slate-500 mb-4">
-          Update your habits below, then copy the row to paste into your Google Sheet.
-        </p>
-        <button 
-          onClick={copyToClipboard}
-          className={`w-full py-3 rounded-lg font-medium flex items-center justify-center space-x-2 transition-all ${
-            copied ? 'bg-green-100 text-green-700' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-          }`}
-        >
-          {copied ? <Check size={18} /> : <Copy size={18} />}
-          <span>{copied ? 'Copied Row!' : 'Copy Row for Google Sheets'}</span>
-        </button>
-      </div>
-
-      <div className="space-y-3">
+      {/* Right Column: Quick Status list */}
+      <div className="lg:col-span-2 space-y-3">
         <h3 className="font-semibold text-slate-700 ml-1">Quick Status</h3>
         {habitsWithStatus.length === 0 ? (
            <div className="text-center p-8 bg-slate-50 rounded-xl border border-dashed border-slate-300">
@@ -360,19 +364,17 @@ export default function HabitForge() {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {habitsWithStatus.map(habit => (
-          <div key={habit.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-             <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-semibold text-lg text-slate-800">{habit.name}</h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500">{habit.category}</span>
-                  </div>
+          <div key={habit.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
+             <div className="mb-4">
+                <h3 className="font-semibold text-lg text-slate-800">{habit.name}</h3>
+                <div className="flex items-center space-x-2 mt-1">
+                  <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500">{habit.category}</span>
                 </div>
              </div>
              
-             <div className="grid grid-cols-3 gap-3">
+             <div className="grid grid-cols-3 gap-3 mt-auto">
                <button 
                 onClick={() => logHabit(habit.id, 'completed')}
                 className={`p-3 rounded-lg flex flex-col items-center justify-center transition-all ${
@@ -429,70 +431,87 @@ export default function HabitForge() {
         <h2 className="text-xl font-bold text-slate-800">Manage Habits</h2>
         <button 
           onClick={() => setShowAddModal(true)}
-          className="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 shadow-md transition-all"
+          className="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 shadow-md transition-all lg:hidden"
         >
           <Plus size={24} />
         </button>
       </div>
 
-      {showAddModal && (
-        <div className="bg-white p-4 rounded-xl shadow-lg border-2 border-indigo-100">
-          <h3 className="font-semibold text-slate-800 mb-3">Add New Habit</h3>
-          <input 
-            type="text" 
-            placeholder="Habit Name"
-            className="w-full p-2 border border-slate-300 rounded-lg mb-3"
-            value={newHabitName}
-            onChange={(e) => setNewHabitName(e.target.value)}
-          />
-          <select 
-            className="w-full p-2 border border-slate-300 rounded-lg mb-4"
-            value={newHabitCategory}
-            onChange={(e) => setNewHabitCategory(e.target.value)}
-          >
-            <option value="General">General</option>
-            <option value="Career/Education">Career & Education</option>
-            <option value="Health">Health & Fitness</option>
-            <option value="Spiritual">Spiritual</option>
-            <option value="Skill Dev">Skill Development</option>
-          </select>
-          <button 
-            onClick={() => addHabit(newHabitName, newHabitCategory)}
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium"
-          >
-            Save Habit
-          </button>
-        </div>
-      )}
-
-      {habits.length === 0 && (
-         <div className="text-center p-8 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-           <button 
-             onClick={importSuggestedHabits}
-             className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium"
-           >
-             Import Priority List
-           </button>
-         </div>
-      )}
-
-      <div className="space-y-3">
-        {habits.map(habit => (
-          <div key={habit.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center">
-             <div className="flex items-center space-x-3">
-               <div className="p-2 bg-slate-100 rounded-lg text-slate-500">
-                 <Activity size={18} />
-               </div>
-               <div>
-                  <h4 className="font-medium text-slate-800">{habit.name}</h4>
-                  <p className="text-xs text-slate-400">{habit.category}</p>
-               </div>
-             </div>
-             <button onClick={() => deleteHabit(habit.id)} className="text-slate-300 hover:text-red-500">
-               <Trash2 size={18} />
-             </button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Side: Creation Panel (visible always on desktop, modal toggled on mobile) */}
+        <div className={`lg:col-span-1 space-y-4 ${showAddModal ? 'block' : 'hidden lg:block'}`}>
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+            <h3 className="font-semibold text-slate-800 mb-3">Add New Habit</h3>
+            <input 
+              type="text" 
+              placeholder="Habit Name"
+              className="w-full p-2.5 border border-slate-200 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              value={newHabitName}
+              onChange={(e) => setNewHabitName(e.target.value)}
+            />
+            <select 
+              className="w-full p-2.5 border border-slate-200 rounded-lg mb-4 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              value={newHabitCategory}
+              onChange={(e) => setNewHabitCategory(e.target.value)}
+            >
+              <option value="General">General</option>
+              <option value="Career/Education">Career & Education</option>
+              <option value="Health">Health & Fitness</option>
+              <option value="Spiritual">Spiritual</option>
+              <option value="Skill Dev">Skill Development</option>
+            </select>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => addHabit(newHabitName, newHabitCategory)}
+                className="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+              >
+                Save Habit
+              </button>
+              {showAddModal && (
+                <button 
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 lg:hidden"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
-        ))}
+        </div>
+
+        {/* Right Side: Active habits list */}
+        <div className="lg:col-span-2 space-y-3">
+          <h3 className="font-semibold text-slate-700 ml-1 hidden lg:block">Active Habits</h3>
+          {habits.length === 0 && (
+             <div className="text-center p-8 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+               <button 
+                 onClick={importSuggestedHabits}
+                 className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-200 transition-colors"
+               >
+                 Import Priority List
+               </button>
+             </div>
+          )}
+
+          <div className="space-y-3">
+            {habits.map(habit => (
+              <div key={habit.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center">
+                 <div className="flex items-center space-x-3">
+                   <div className="p-2 bg-slate-100 rounded-lg text-slate-500">
+                     <Activity size={18} />
+                   </div>
+                   <div>
+                      <h4 className="font-medium text-slate-800">{habit.name}</h4>
+                      <p className="text-xs text-slate-400">{habit.category}</p>
+                   </div>
+                 </div>
+                 <button onClick={() => deleteHabit(habit.id)} className="text-slate-300 hover:text-red-500 p-1 rounded transition-colors">
+                   <Trash2 size={18} />
+                 </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -504,42 +523,100 @@ export default function HabitForge() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 max-w-md mx-auto shadow-2xl overflow-hidden flex flex-col relative">
-      <header className="bg-white border-b border-slate-200 p-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
-              <Activity className="text-white" size={20} />
-            </div>
-            <span className="text-xl font-bold text-slate-800">HabitForge</span>
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col md:flex-row relative">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:w-64 bg-white border-r border-slate-200 flex-col sticky top-0 h-screen p-6">
+        <div className="flex items-center space-x-2 mb-8">
+          <div className="bg-indigo-600 p-1.5 rounded-lg">
+            <Activity className="text-white" size={20} />
           </div>
-          <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
-            <Star size={14} className="text-yellow-500 mr-1" fill="currentColor" />
-            <span className="text-xs font-bold text-yellow-700">{todayStars} Stars</span>
+          <span className="text-xl font-bold text-slate-800">HabitForge</span>
+        </div>
+        
+        <nav className="flex-1 space-y-2">
+          <button 
+            onClick={() => setView('dashboard')} 
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
+              view === 'dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'
+            }`}
+          >
+            <BarChart3 size={20} />
+            <span>Progress</span>
+          </button>
+          
+          <button 
+            onClick={() => setView('checkin')} 
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
+              view === 'checkin' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'
+            }`}
+          >
+            <Calendar size={20} />
+            <span>Check-in</span>
+          </button>
+          
+          <button 
+            onClick={() => setView('habits')} 
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
+              view === 'habits' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'
+            }`}
+          >
+            <Edit2 size={20} />
+            <span>Habits</span>
+          </button>
+        </nav>
+        
+        <div className="mt-auto border-t border-slate-100 pt-4">
+          <div className="flex items-center justify-between bg-yellow-50 px-3 py-2 rounded-lg border border-yellow-100">
+            <div className="flex items-center">
+              <Star size={16} className="text-yellow-500 mr-2" fill="currentColor" />
+              <span className="text-sm font-semibold text-yellow-800">Today's Stars</span>
+            </div>
+            <span className="text-sm font-bold text-yellow-700">{todayStars}</span>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <main className="flex-1 p-4 pb-24 overflow-y-auto">
-        {view === 'dashboard' && renderDashboard()}
-        {view === 'checkin' && renderCheckIn()}
-        {view === 'habits' && renderHabitsManager()}
-      </main>
+      {/* Main content wrapper */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Mobile Header */}
+        <header className="bg-white border-b border-slate-200 p-4 sticky top-0 z-10 md:hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="bg-indigo-600 p-1.5 rounded-lg">
+                <Activity className="text-white" size={20} />
+              </div>
+              <span className="text-xl font-bold text-slate-800">HabitForge</span>
+            </div>
+            <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
+              <Star size={14} className="text-yellow-500 mr-1" fill="currentColor" />
+              <span className="text-xs font-bold text-yellow-700">{todayStars} Stars</span>
+            </div>
+          </div>
+        </header>
 
-      <nav className="absolute bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-3 pb-6">
-        <button onClick={() => setView('dashboard')} className={`flex flex-col items-center space-y-1 ${view === 'dashboard' ? 'text-indigo-600' : 'text-slate-400'}`}>
-          <BarChart3 size={24} />
-          <span className="text-[10px] font-medium">Progress</span>
-        </button>
-        <button onClick={() => setView('checkin')} className={`flex flex-col items-center space-y-1 ${view === 'checkin' ? 'text-indigo-600' : 'text-slate-400'}`}>
-          <Calendar size={24} />
-          <span className="text-[10px] font-medium">Check-in</span>
-        </button>
-        <button onClick={() => setView('habits')} className={`flex flex-col items-center space-y-1 ${view === 'habits' ? 'text-indigo-600' : 'text-slate-400'}`}>
-          <Edit2 size={24} />
-          <span className="text-[10px] font-medium">Habits</span>
-        </button>
-      </nav>
+        {/* Content body */}
+        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto max-w-5xl w-full mx-auto">
+          {view === 'dashboard' && renderDashboard()}
+          {view === 'checkin' && renderCheckIn()}
+          {view === 'habits' && renderHabitsManager()}
+        </main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-3 pb-6 md:hidden z-10">
+          <button onClick={() => setView('dashboard')} className={`flex flex-col items-center space-y-1 ${view === 'dashboard' ? 'text-indigo-600' : 'text-slate-400'}`}>
+            <BarChart3 size={24} />
+            <span className="text-[10px] font-medium">Progress</span>
+          </button>
+          <button onClick={() => setView('checkin')} className={`flex flex-col items-center space-y-1 ${view === 'checkin' ? 'text-indigo-600' : 'text-slate-400'}`}>
+            <Calendar size={24} />
+            <span className="text-[10px] font-medium">Check-in</span>
+          </button>
+          <button onClick={() => setView('habits')} className={`flex flex-col items-center space-y-1 ${view === 'habits' ? 'text-indigo-600' : 'text-slate-400'}`}>
+            <Edit2 size={24} />
+            <span className="text-[10px] font-medium">Habits</span>
+          </button>
+        </nav>
+      </div>
     </div>
   );
 }
