@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Deny read/write by default for all documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow users to read and write only their own habits and logs
+    match /artifacts/{appId}/users/{uid}/{subcollection}/{documentId} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
